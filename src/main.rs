@@ -17,5 +17,5 @@ fn main() {
 }
 
 fn hello_world() {
-    println!("THIS CODE RUNS EVERY FRAME YAYYYYYYYY!");
+    println!("THIS CODE RUNS EVERY FRAME!");
 }
