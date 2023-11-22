@@ -5,8 +5,11 @@ pub mod blue_layer;
 pub fn test_function() {
     println!("map works!");
 }
-pub struct Color{
-    r:u8,
-    g:u8,
-    b:u8,
+
+pub fn get_cell() {
+    
+}
+
+pub fn set_cell() {
+
 }
