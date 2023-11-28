@@ -7,8 +7,8 @@ use bevy_pixel_buffer::prelude::*;
 
 const UPDATE_RATE: f64 = 0.25;
 const MAP_SIZE: PixelBufferSize = PixelBufferSize {
-    size: UVec2::new(160, 90),       // amount of pixels
-    pixel_size: UVec2::new(5, 5), // size of each pixel in the screen
+    size: UVec2::new(160, 90),    // amount of pixels
+    pixel_size: UVec2::new(9, 9), // size of each pixel in the screen
 };
 
 fn main() {
@@ -40,14 +40,23 @@ fn main() {
                 .setup()
         )
         // FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
-        .add_systems(FixedUpdate, update_screen)
+        .add_systems(FixedUpdate, update_simulation)
         // set FixedUpdate rate
         .insert_resource(Time::<Fixed>::from_seconds(UPDATE_RATE))
         .run();
 }
 
-fn update_screen(mut pb: QueryPixelBuffer) {
+fn update_simulation(mut pb: QueryPixelBuffer) {
+
+    // SEPARATE PIXEL DATA INTO IT'S OWN ARRAY
+    // INITIALIZE ARRAYS FOR EVERY COLOR
+    // CALCULATE ARRAY OF COLORS WITH PIXEL DATA
+    // SET ALL SCREEN TO COMBINATION OF PIXEL DATAS
+
+
+
+
+    // THIS IS PLACEHOLDER CODE
     // Set each pixel to a random color
     pb.frame().per_pixel(|_, _| Pixel::random());
-    //pb.frame().try_into()
 }
