@@ -1,8 +1,11 @@
 mod map;
 
-use bevy::prelude::*;
-use bevy::time::prelude::Fixed;
-use bevy::window::WindowMode;
+// this is how to do imports *the cool, brogrammer way*
+use bevy::{
+    prelude::*, // for example, this actually means bevy::prelude::*
+    time::prelude::Fixed, // and this actually means bevy::time::prelude::Fixed
+    window::WindowMode, // basically it means you have to type in "bevy::" 3 times less, but also makes everything 100% more confusing
+};
 use bevy_pixel_buffer::prelude::*;
 
 const UPDATE_RATE: f64 = 0.25;
@@ -14,10 +17,10 @@ const MAP_SIZE: PixelBufferSize = PixelBufferSize {
 fn main() {
     println!("i like cats");
 
+    map::test_function();
     map::red_layer::test_function();
     map::green_layer::test_function();
     map::blue_layer::test_function();
-    map::test_function();
 
     // All window setting in here
     // docs for "Window": https://docs.rs/bevy/latest/bevy/window/struct.Window.html
