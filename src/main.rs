@@ -19,6 +19,8 @@ fn main() {
     map::blue_layer::test_function();
     map::test_function();
 
+    // All window setting in here
+    // docs for "Window": https://docs.rs/bevy/latest/bevy/window/struct.Window.html
     let window_plugin = WindowPlugin {
         primary_window: Some(Window {
             title: String::from("Cellular Automata by Makki & Emil"),
