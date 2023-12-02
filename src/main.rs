@@ -8,11 +8,19 @@ use bevy::{
 };
 use bevy_pixel_buffer::prelude::*;
 
+
+// How often the screen is updated and calculations are run
 const UPDATE_RATE: f64 = 0.25;
-const MAP_SIZE: PixelBufferSize = PixelBufferSize {
+
+// Map dimensions
+const MAP_DIMS: PixelBufferSize = PixelBufferSize {
     size: UVec2::new(160, 90),    // amount of pixels
     pixel_size: UVec2::new(9, 9), // size of each pixel in the screen
 };
+
+// How large flattened arrays storing the map data should be
+const ARRAY_LENGTH: usize = (MAP_DIMS.size.x * MAP_DIMS.size.y) as usize;
+
 
 fn main() {
     println!("i like cats");
@@ -37,29 +45,63 @@ fn main() {
         .add_plugins(DefaultPlugins.set(window_plugin))
         .add_systems(
             Startup, 
-            PixelBufferBuilder::new()
-                .with_size(MAP_SIZE)
-                .with_fill(FillKind::Window)
-                .setup()
+            setup_simulation
         )
-        // FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
-        .add_systems(FixedUpdate, update_simulation)
-        // set FixedUpdate rate
-        .insert_resource(Time::<Fixed>::from_seconds(UPDATE_RATE))
+        .add_systems(
+            FixedUpdate, // FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
+            update_simulation
+        )
+        .insert_resource(
+            Time::<Fixed>::from_seconds(UPDATE_RATE) // set FixedUpdate rate
+        )
         .run();
+}
+
+fn setup_simulation(
+    mut commands: Commands,
+    mut images: ResMut<Assets<Image>>,
+) {
+    PixelBufferBuilder::new()
+        .with_size(MAP_DIMS)
+        .spawn(&mut commands, &mut images)
+
+        // initialize map with random pixel data
+        .edit_frame(|frame| {
+            frame.per_pixel(|_, _| {
+                if rand::random::<f32>() > 0.9 {
+                    Pixel::WHITE
+                } else {
+                    Pixel::TRANSPARENT
+                }
+            })
+        });
 }
 
 fn update_simulation(mut pb: QueryPixelBuffer) {
 
-    // SEPARATE PIXEL DATA INTO IT'S OWN ARRAY
-    // INITIALIZE ARRAYS FOR EVERY COLOR
-    // CALCULATE ARRAY OF COLORS WITH PIXEL DATA
-    // SET ALL SCREEN TO COMBINATION OF PIXEL DATAS
+    let frame = pb.frame();
+    let cur_gen: &[Pixel] = frame.raw();
 
+    let next_gen = map::calculate_next_gen_conway(cur_gen);
 
+    /*
+    let mut next_gen: [Pixel; ARRAY_LENGTH] = array_init::array_init(|_| {
+        if rand::random::<f32>() > 0.9 {
+            Pixel::RED
+        } else {
+            Pixel::TRANSPARENT
+        }
+    }); // PLACEHOLDER
+     */
 
+    // SET THE SCREEN TO THE NEXT GENERATION
+    pb.frame().per_pixel_par(|pos, _| {
+       let index = (pos.x + pos.y * MAP_DIMS.size.y) as usize;
+       next_gen[index]
+    });
+    //frame.per_pixel(|_, _| Pixel::WHITE);
 
     // THIS IS PLACEHOLDER CODE
     // Set each pixel to a random color
-    pb.frame().per_pixel(|_, _| Pixel::random());
+    //pb.frame().per_pixel(|_, _| Pixel::random());
 }
