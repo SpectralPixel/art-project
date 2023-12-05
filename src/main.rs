@@ -10,12 +10,12 @@ use bevy_pixel_buffer::prelude::*;
 
 
 // How often the screen is updated and calculations are run
-const UPDATE_RATE: f64 = 0.25;
+const UPDATE_RATE: f64 = 1.;
 
 // Map dimensions
 const MAP_DIMS: PixelBufferSize = PixelBufferSize {
-    size: UVec2::new(160, 90),    // amount of pixels
-    pixel_size: UVec2::new(9, 9), // size of each pixel in the screen
+    size: UVec2::new(40, 22),       // amount of pixels               160, 90
+    pixel_size: UVec2::new(36, 36), // size of each pixel onscreen      9, 9
 };
 
 // How large flattened arrays storing the map data should be
@@ -79,6 +79,8 @@ fn setup_simulation(
 
 fn update_simulation(mut pb: QueryPixelBuffer) {
 
+    println!("----------");
+
     let frame = pb.frame();
     let cur_gen: &[Pixel] = frame.raw();
 
@@ -96,7 +98,7 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
 
     // SET THE SCREEN TO THE NEXT GENERATION
     pb.frame().per_pixel_par(|pos, _| {
-       let index = (pos.x + pos.y * MAP_DIMS.size.y) as usize;
+       let index = (pos.x + pos.y * MAP_DIMS.size.x) as usize;
        next_gen[index]
     });
     //frame.per_pixel(|_, _| Pixel::WHITE);
