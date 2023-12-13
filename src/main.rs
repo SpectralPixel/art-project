@@ -7,10 +7,11 @@ use bevy::{
     window::WindowMode, // basically it means you have to type in "bevy::" 3 times less, but also makes everything 100% more confusing
 };
 use bevy_pixel_buffer::prelude::*;
+use std::time::SystemTime;
 
 
 // How often the screen is updated and calculations are run
-const UPDATE_RATE: f64 = 5.0;
+const UPDATE_RATE: f64 = 1.0;
 
 // Map dimensions
 const MAP_DIMS: PixelBufferSize = PixelBufferSize {
@@ -79,7 +80,7 @@ fn setup_simulation(
 
 fn update_simulation(mut pb: QueryPixelBuffer) {
 
-    println!("----------");
+    let step_start_timestamp = SystemTime::now();
 
     let mut frame = pb.frame();
     let cur_gen: &[Pixel] = &frame.raw();
@@ -107,4 +108,12 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
     // THIS IS PLACEHOLDER CODE
     // Set each pixel to a random color
     //pb.frame().per_pixel(|_, _| Pixel::random());
+
+    println!(
+        "Time to calculate: {}",
+        SystemTime::now() // gets the current system time
+            .duration_since(step_start_timestamp) // gets the difference between the current time and the time at the start of the calculation, returns Result<Type, Error>
+            .unwrap_or_default() // gets the Type out of the returned Result<Type, Error>, and if there is an error it just turns it into the default (which in this case is 0)
+            .as_secs_f32() // cast from Duration into f32
+    )
 }

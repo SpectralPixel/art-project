@@ -1,7 +1,10 @@
 use bevy::math::*;
 use bevy_pixel_buffer::pixel::Pixel;
 use array_init::array_init;
-use crate::{ARRAY_LENGTH, MAP_DIMS};
+use crate::{
+    ARRAY_LENGTH,
+    MAP_DIMS
+};
 
 pub mod red_layer;
 pub mod green_layer;
@@ -39,7 +42,8 @@ pub fn calculate_next_gen_conway(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
         };
         //println!("i: {} - pos: {}, {}", cell_index, cell_pos.x, cell_pos.y);
 
-        if cell_pos.x == 0 || cell_pos.y == 0 || cell_pos.x == MAP_DIMS.size.x - 1 || cell_pos.y == MAP_DIMS.size.y - 1 {
+        //if cell_pos.x == 0 || cell_pos.y == 0 || cell_pos.x == MAP_DIMS.size.x - 1 || cell_pos.y == MAP_DIMS.size.y - 1 {
+        if cell_index % 7 == 0 {
             calc_conway[cell_index] = Pixel::RED;
             continue;
         }
