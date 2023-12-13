@@ -75,14 +75,13 @@ fn get_nearby_cell_count(pos: &UVec2, cur_gen: &[Pixel]) -> u8 {
         IVec2 {x: -1, y: -1}, IVec2 {x: 0, y: -1}, IVec2 {x: -1, y: -1},
     ];
 
-    println!("test");
     for dir in check_directions {
         let check_pos = IVec2 {
             x: pos.x as i32 + dir.x,
             y: pos.y as i32 + dir.y
         };
 
-        println!("{} + {} = {}", &pos, &dir, &check_pos);
+        //println!("{} + {} = {}", &pos, &dir, &check_pos);
 
         nearby_cell_count += get_cell_value_conway(check_pos, &cur_gen);
     }

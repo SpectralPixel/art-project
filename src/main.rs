@@ -10,7 +10,7 @@ use bevy_pixel_buffer::prelude::*;
 
 
 // How often the screen is updated and calculations are run
-const UPDATE_RATE: f64 = 1.;
+const UPDATE_RATE: f64 = 5.0;
 
 // Map dimensions
 const MAP_DIMS: PixelBufferSize = PixelBufferSize {
@@ -81,11 +81,11 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
 
     println!("----------");
 
-    let frame = pb.frame();
-    let cur_gen: &[Pixel] = frame.raw();
+    let mut frame = pb.frame();
+    let cur_gen: &[Pixel] = &frame.raw();
 
-    //let next_gen = map::calculate_next_gen_conway(cur_gen);
-    let next_gen: [Pixel] = cur_gen;
+    let next_gen = map::calculate_next_gen_conway(cur_gen);
+    
 
     /*
     let mut next_gen: [Pixel; ARRAY_LENGTH] = array_init::array_init(|_| {
