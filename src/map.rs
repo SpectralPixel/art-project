@@ -26,6 +26,7 @@ pub fn test_function() {
 pub fn calculate_next_gen_conway(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 
     let mut calc_conway: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::TRANSPARENT);
+    let mut live_cells = 0;
 
     for cell_index in 0..cur_gen.len() {
 
@@ -44,13 +45,20 @@ pub fn calculate_next_gen_conway(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
         }
 
         let nearby_cell_count = get_nearby_cell_count(&cell_pos, &cur_gen);
-        if nearby_cell_count > 3 {
-            println!("neighbors: {}", nearby_cell_count);
-        }
+        // if nearby_cell_count > 3 {
+        //     println!("neighbors: {}", nearby_cell_count);
+        // }
 
         let calc_cell = apply_rules_conway(nearby_cell_count, cell);
+
+        if calc_cell == Pixel::WHITE {
+            live_cells += 1;
+        }
+
         calc_conway[cell_index] = calc_cell;
     }
+
+    println!("{} cells alive!", live_cells);
 
     calc_conway
 
@@ -67,13 +75,14 @@ fn get_nearby_cell_count(pos: &UVec2, cur_gen: &[Pixel]) -> u8 {
         IVec2 {x: -1, y: -1}, IVec2 {x: 0, y: -1}, IVec2 {x: -1, y: -1},
     ];
 
+    println!("test");
     for dir in check_directions {
         let check_pos = IVec2 {
             x: pos.x as i32 + dir.x,
             y: pos.y as i32 + dir.y
         };
 
-        //println!("{} + {} = {}", &pos, &dir, &check_pos);
+        println!("{} + {} = {}", &pos, &dir, &check_pos);
 
         nearby_cell_count += get_cell_value_conway(check_pos, &cur_gen);
     }

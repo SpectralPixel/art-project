@@ -84,7 +84,8 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
     let frame = pb.frame();
     let cur_gen: &[Pixel] = frame.raw();
 
-    let next_gen = map::calculate_next_gen_conway(cur_gen);
+    //let next_gen = map::calculate_next_gen_conway(cur_gen);
+    let next_gen: [Pixel] = cur_gen;
 
     /*
     let mut next_gen: [Pixel; ARRAY_LENGTH] = array_init::array_init(|_| {
@@ -97,7 +98,7 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
      */
 
     // SET THE SCREEN TO THE NEXT GENERATION
-    pb.frame().per_pixel_par(|pos, _| {
+    frame.per_pixel_par(|pos, _| {
        let index = (pos.x + pos.y * MAP_DIMS.size.x) as usize;
        next_gen[index]
     });
