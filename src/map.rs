@@ -25,7 +25,7 @@ pub fn test_function() {
 
 pub fn calculate_next_gen_conway(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 
-    let mut calc_conway: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::TRANSPARENT);
+    let mut calc_conway: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::BLACK);
     let mut live_cells = 0;
 
     for cell_index in 0..cur_gen.len() {
@@ -151,6 +151,6 @@ fn apply_rules_conway(nearby_cell_count: u8, cur_cell: Pixel) -> Pixel {
     }
     else {
         //println!("{} cell near {} -> dead", state, nearby_cell_count);
-        Pixel::TRANSPARENT
+        Pixel::BLACK
     }
 }
