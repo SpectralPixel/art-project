@@ -10,7 +10,7 @@ use bevy_pixel_buffer::prelude::*;
 use std::time::SystemTime;
 
 // How often the screen is updated and calculations are run
-const UPDATE_RATE: f64 = 1.0;
+const UPDATE_RATE: f64 = 1.0; // IMPORTANT!!!!!!!!! use space to progress time for now
 
 // Map dimensions
 const MAP_DIMS: PixelBufferSize = PixelBufferSize {
@@ -109,7 +109,7 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
         if next_gen[index] != Pixel::WHITE {
             let mut tile_color = next_gen[index].as_color();
             let manhattan_pos = pos.x + pos.y;
-            let effect_strength: f32 = 0.15;
+            let effect_strength: f32 = 0.1;
             let checkerboard_subtraction: f32 = (manhattan_pos % 2) as f32 * effect_strength;
             
             tile_color.set_l((tile_color.l() - checkerboard_subtraction).abs());
