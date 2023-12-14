@@ -2,13 +2,12 @@ mod map;
 
 // this is how to do imports *the cool, brogrammer way*
 use bevy::{
-    prelude::*, // for example, this actually means bevy::prelude::*
+    prelude::*,           // for example, this actually means bevy::prelude::*
     time::prelude::Fixed, // and this actually means bevy::time::prelude::Fixed
-    window::WindowMode, // basically it means you have to type in "bevy::" 3 times less, but also makes everything 100% more confusing
+    window::WindowMode,   // basically it means you have to type in "bevy::" 3 times less, but also makes everything 100% more confusing
 };
 use bevy_pixel_buffer::prelude::*;
 use std::time::SystemTime;
-
 
 // How often the screen is updated and calculations are run
 const UPDATE_RATE: f64 = 1.0;
@@ -21,7 +20,6 @@ const MAP_DIMS: PixelBufferSize = PixelBufferSize {
 
 // How large flattened arrays storing the map data should be
 const ARRAY_LENGTH: usize = (MAP_DIMS.size.x * MAP_DIMS.size.y) as usize;
-
 
 fn main() {
     println!("i like cats");
@@ -44,28 +42,29 @@ fn main() {
 
     App::new()
         .add_plugins(DefaultPlugins.set(window_plugin))
+        .add_systems(Startup, setup_simulation)
         .add_systems(
-            Startup, 
-            setup_simulation
+            PostStartup, // FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
+            update_simulation,
         )
         .add_systems(
-            FixedUpdate, // FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
-            update_simulation
+            Update, // (chenge this line to fixedupdate instead of update in final product) FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
+            check_for_keys,
+        )
+        .add_systems(
+            Update,
+            bevy::window::close_on_esc, // close window when esc is pressed
         )
         .insert_resource(
-            Time::<Fixed>::from_seconds(UPDATE_RATE) // set FixedUpdate rate
+            Time::<Fixed>::from_seconds(UPDATE_RATE), // set FixedUpdate rate
         )
         .run();
 }
 
-fn setup_simulation(
-    mut commands: Commands,
-    mut images: ResMut<Assets<Image>>,
-) {
+fn setup_simulation(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
     PixelBufferBuilder::new()
         .with_size(MAP_DIMS)
         .spawn(&mut commands, &mut images)
-
         // initialize map with random pixel data
         .edit_frame(|frame| {
             frame.per_pixel(|_, _| {
@@ -78,15 +77,19 @@ fn setup_simulation(
         });
 }
 
-fn update_simulation(mut pb: QueryPixelBuffer) {
+fn check_for_keys(pb: QueryPixelBuffer, keys: Res<Input<KeyCode>>) {
+    if keys.just_pressed(KeyCode::Space) {
+        update_simulation(pb);
+    }
+}
 
+fn update_simulation(mut pb: QueryPixelBuffer) {
     let step_start_timestamp = SystemTime::now();
 
     let mut frame = pb.frame();
     let cur_gen: &[Pixel] = &frame.raw();
 
     let next_gen = map::calculate_next_gen_conway(cur_gen);
-    
 
     /*
     let mut next_gen: [Pixel; ARRAY_LENGTH] = array_init::array_init(|_| {
@@ -96,13 +99,36 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
             Pixel::TRANSPARENT
         }
     }); // PLACEHOLDER
-     */
+        */
 
     // SET THE SCREEN TO THE NEXT GENERATION
     frame.per_pixel_par(|pos, _| {
-       let index = (pos.x + pos.y * MAP_DIMS.size.x) as usize;
-       next_gen[index]
+        let index = (pos.x + pos.y * MAP_DIMS.size.x) as usize;
+
+        // if the pixel is white, add a checkerboard pattern
+        if next_gen[index] != Pixel::WHITE {
+            let mut tile_color = next_gen[index].as_color();
+            let manhattan_pos = pos.x + pos.y;
+            let effect_strength: f32 = 0.15;
+            let checkerboard_subtraction: f32 = (manhattan_pos % 2) as f32 * effect_strength;
+            
+            tile_color.set_l((tile_color.l() - checkerboard_subtraction).abs());
+
+            Pixel::from(tile_color)
+        } else {
+            next_gen[index]
+        }
     });
+
+    let mut white_cell_count = 0;
+    let count_gen: &[Pixel] = &frame.raw();
+    for pixel in count_gen {
+        if *pixel == Pixel::WHITE {
+            white_cell_count += 1;
+        }
+    }
+    println!("{} live cells displayed!", white_cell_count);
+
     //frame.per_pixel(|_, _| Pixel::WHITE);
 
     // THIS IS PLACEHOLDER CODE
