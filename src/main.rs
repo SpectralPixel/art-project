@@ -24,12 +24,6 @@ const ARRAY_LENGTH: usize = (MAP_DIMS.size.x * MAP_DIMS.size.y) as usize;
 fn main() {
     println!("i like cats");
 
-    layer::test_function();
-    layer::red::test_function();
-    layer::green::test_function();
-    layer::blue::test_function();
-    layer::conway::test_function();
-
     // All window setting in here
     // docs for "Window": https://docs.rs/bevy/latest/bevy/window/struct.Window.html
     let window_plugin = WindowPlugin {

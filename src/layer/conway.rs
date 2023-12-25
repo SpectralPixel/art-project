@@ -3,20 +3,18 @@ use array_init::array_init;
 use bevy::math::*;
 use bevy_pixel_buffer::pixel::Pixel;
 
-const PATTERN: [IVec2; 8] = [
-    IVec2 { x: -1, y: 1 },
-    IVec2 { x: 0, y: 1 },
-    IVec2 { x: 1, y: 1 },
-    IVec2 { x: -1, y: 0 },
-    IVec2 { x: 1, y: 0 },
-    IVec2 { x: -1, y: -1 },
-    IVec2 { x: 0, y: -1 },
-    IVec2 { x: 1, y: -1 },
-];
+use super::Weight;
 
-pub fn test_function() {
-    println!("conway layer works!");
-}
+const PATTERN: [Weight; 8] = [
+    Weight { position: IVec2 { x: -1, y:  1 }, multiplier: 1. },
+    Weight { position: IVec2 { x:  0, y:  1 }, multiplier: 1. },
+    Weight { position: IVec2 { x:  1, y:  1 }, multiplier: 1. },
+    Weight { position: IVec2 { x: -1, y:  0 }, multiplier: 1. },
+    Weight { position: IVec2 { x:  1, y:  0 }, multiplier: 1. },
+    Weight { position: IVec2 { x: -1, y: -1 }, multiplier: 1. },
+    Weight { position: IVec2 { x:  0, y: -1 }, multiplier: 1. },
+    Weight { position: IVec2 { x:  1, y: -1 }, multiplier: 1. }
+];
 
 pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
     let mut calculated_gen: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::WHITE);

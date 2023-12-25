@@ -3,18 +3,14 @@ use array_init::array_init;
 use bevy::math::*;
 use bevy_pixel_buffer::pixel::Pixel;
 
-pub mod blue;
-pub mod green;
-pub mod red;
 pub mod conway;
 
-
-
-pub fn test_function() {
-    println!("map works!");
+pub struct Weight {
+    position: IVec2,
+    multiplier: f64
 }
 
-pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
+pub fn _calculate_next_gen(_cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 
     // let calculated_red: [f64; ARRAY_LENGTH] = array_init(|_| 0.);
     // let calculated_green: [f64; ARRAY_LENGTH] = array_init(|_| 0.);
@@ -24,16 +20,17 @@ pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
     placeholder
 }
 
-pub fn calc_cell_sum(pos: &UVec2, pattern: &[IVec2], cur_gen: &[Pixel]) -> f64 {
+pub fn calc_cell_sum(pos: &UVec2, pattern: &[Weight], cur_gen: &[Pixel]) -> f64 {
     let mut cell_value = 0.; 
 
-    for rel_pos in pattern {
+    for weight in pattern {
+        let rel_pos = weight.position;
         let check_pos = IVec2 {
             x: pos.x as i32 + rel_pos.x,
             y: pos.y as i32 + rel_pos.y,
         };
 
-        cell_value += get_cell_value(check_pos, &cur_gen);
+        cell_value += get_cell_value(check_pos, &cur_gen) * weight.multiplier;
     }
 
     cell_value
