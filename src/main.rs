@@ -90,7 +90,7 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
     let mut frame = pb.frame();
     let cur_gen: &[Pixel] = &frame.raw();
 
-    let next_gen = layer::calculate_next_gen_conway(cur_gen);
+    let next_gen = layer::conway::calculate_next_gen(cur_gen);
 
     // SET THE SCREEN TO THE NEXT GENERATION
     frame.per_pixel_par(|pos, _| {
