@@ -1,4 +1,4 @@
-mod map;
+mod layer;
 
 // this is how to do imports *the cool, brogrammer way*
 use bevy::{
@@ -24,10 +24,11 @@ const ARRAY_LENGTH: usize = (MAP_DIMS.size.x * MAP_DIMS.size.y) as usize;
 fn main() {
     println!("i like cats");
 
-    map::test_function();
-    map::red_layer::test_function();
-    map::green_layer::test_function();
-    map::blue_layer::test_function();
+    layer::test_function();
+    layer::red::test_function();
+    layer::green::test_function();
+    layer::blue::test_function();
+    layer::conway::test_function();
 
     // All window setting in here
     // docs for "Window": https://docs.rs/bevy/latest/bevy/window/struct.Window.html
@@ -89,7 +90,7 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
     let mut frame = pb.frame();
     let cur_gen: &[Pixel] = &frame.raw();
 
-    let next_gen = map::calculate_next_gen_conway(cur_gen);
+    let next_gen = layer::calculate_next_gen_conway(cur_gen);
 
     // SET THE SCREEN TO THE NEXT GENERATION
     frame.per_pixel_par(|pos, _| {
@@ -109,15 +110,6 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
             next_gen[index]
         }
     });
-
-    let mut white_cell_count = 0;
-    let count_gen: &[Pixel] = &frame.raw();
-    for pixel in count_gen {
-        if *pixel == Pixel::WHITE {
-            white_cell_count += 1;
-        }
-    }
-    println!("{} live cells displayed!", white_cell_count);
 
     println!(
         "Time to calculate: {}",
