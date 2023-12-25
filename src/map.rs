@@ -22,7 +22,7 @@ pub fn test_function() {
 // }
 
 pub fn calculate_next_gen_conway(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
-    let mut calc_conway: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::BLACK);
+    let mut calculated_conway: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::BLACK);
     let mut live_cells = 0;
 
     for cell_index in 0..cur_gen.len() {
@@ -46,18 +46,23 @@ pub fn calculate_next_gen_conway(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
         //     println!("neighbors: {}", nearby_cell_count);
         // }
 
-        let calc_cell = apply_rules_conway(nearby_cell_count, cell);
+        let calculated_cell = apply_rules_conway(nearby_cell_count, cell);
+        
+        if cell_pos == UVec2::splat(10) {
+            let checked_cell_color = &calculated_cell.as_color();
+            println!("{} cells near pixel ({},{}) -> turned ({},{},{})", nearby_cell_count, cell_pos.x, cell_pos.y, checked_cell_color.r(), checked_cell_color.g(), checked_cell_color.b());
+        }
 
-        if calc_cell == Pixel::WHITE {
+        if calculated_cell == Pixel::WHITE {
             live_cells += 1;
         }
 
-        calc_conway[cell_index] = calc_cell;
+        calculated_conway[cell_index] = calculated_cell;
     }
 
     println!("{} cells alive!", live_cells);
 
-    calc_conway
+    calculated_conway
 }
 
 fn get_nearby_cell_count(pos: &UVec2, cur_gen: &[Pixel]) -> u8 {
@@ -69,10 +74,10 @@ fn get_nearby_cell_count(pos: &UVec2, cur_gen: &[Pixel]) -> u8 {
         IVec2 { x: 0, y: 1 },
         IVec2 { x: 1, y: 1 },
         IVec2 { x: -1, y: 0 },
-        /*  CUR CELL POS  */ IVec2 { x: -1, y: 1 },
+        IVec2 { x: 1, y: 0 },
         IVec2 { x: -1, y: -1 },
         IVec2 { x: 0, y: -1 },
-        IVec2 { x: -1, y: -1 },
+        IVec2 { x: 1, y: -1 },
     ];
 
     for dir in check_directions {
@@ -90,12 +95,9 @@ fn get_nearby_cell_count(pos: &UVec2, cur_gen: &[Pixel]) -> u8 {
 }
 
 fn get_cell_value_conway(pos: IVec2, cur_gen: &[Pixel]) -> u8 {
-    // ensure that the position is inbounds and turn it into a UVec2 rather than a IVec32
-    let pos = ensure_inbounds(&pos);
+    let inbounds_pos = ensure_inbounds(pos);
 
-    //println!("{}", &pos);
-
-    let flattened_pos: usize = (pos.x + pos.y * MAP_DIMS.size.x) as usize;
+    let flattened_pos: usize = flatten_pos(inbounds_pos);
     if cur_gen[flattened_pos] == Pixel::WHITE {
         1
     } else {
@@ -103,26 +105,24 @@ fn get_cell_value_conway(pos: IVec2, cur_gen: &[Pixel]) -> u8 {
     }
 }
 
-fn ensure_inbounds(pos: &IVec2) -> UVec2 {
+fn flatten_pos(pos: UVec2) -> usize {
+    (pos.x + pos.y * MAP_DIMS.size.x) as usize
+}
+
+fn ensure_inbounds(pos: IVec2) -> UVec2 {
     let mut pos = IVec2 { x: pos.x, y: pos.y };
-    //let prev_pos = IVec2 { x: pos.x, y: pos.y };
 
     pos.x = if pos.x < 0 {
-        (MAP_DIMS.size.x - 1) as i32
+        pos.x + MAP_DIMS.size.x as i32
     } else {
         pos.x % MAP_DIMS.size.x as i32
     };
 
     pos.y = if pos.y < 0 {
-        (MAP_DIMS.size.y - 1) as i32
+        pos.y + MAP_DIMS.size.y as i32
     } else {
         pos.y % MAP_DIMS.size.y as i32
     };
-
-    // // print inbounds checks
-    // if pos != prev_pos {
-    //     println!("{}, {} -> {}, {}", prev_pos.x, prev_pos.y, pos.x, pos.y);
-    // }
 
     UVec2 {
         x: pos.x as u32,
