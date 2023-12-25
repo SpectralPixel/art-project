@@ -91,16 +91,6 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
 
     let next_gen = map::calculate_next_gen_conway(cur_gen);
 
-    /*
-    let mut next_gen: [Pixel; ARRAY_LENGTH] = array_init::array_init(|_| {
-        if rand::random::<f32>() > 0.9 {
-            Pixel::RED
-        } else {
-            Pixel::TRANSPARENT
-        }
-    }); // PLACEHOLDER
-        */
-
     // SET THE SCREEN TO THE NEXT GENERATION
     frame.per_pixel_par(|pos, _| {
         let index = (pos.x + pos.y * MAP_DIMS.size.x) as usize;
@@ -128,12 +118,6 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
         }
     }
     println!("{} live cells displayed!", white_cell_count);
-
-    //frame.per_pixel(|_, _| Pixel::WHITE);
-
-    // THIS IS PLACEHOLDER CODE
-    // Set each pixel to a random color
-    //pb.frame().per_pixel(|_, _| Pixel::random());
 
     println!(
         "Time to calculate: {}",

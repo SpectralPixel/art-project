@@ -26,25 +26,14 @@ pub fn calculate_next_gen_conway(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
     let mut live_cells = 0;
 
     for cell_index in 0..cur_gen.len() {
-        //println!();
 
         let cell = cur_gen[cell_index];
         let cell_pos = UVec2 {
             x: cell_index as u32 % MAP_DIMS.size.x,
             y: (cell_index as f64 / MAP_DIMS.size.x as f64).floor() as u32,
         };
-        //println!("i: {} - pos: {}, {}", cell_index, cell_pos.x, cell_pos.y);
-
-        // //if cell_pos.x == 0 || cell_pos.y == 0 || cell_pos.x == MAP_DIMS.size.x - 1 || cell_pos.y == MAP_DIMS.size.y - 1 {
-        // if cell_index % 7 == 0 {
-        //    calc_conway[cell_index] = Pixel::RED;
-        //    continue;
-        // }
 
         let nearby_cell_count = get_nearby_cell_count(&cell_pos, &cur_gen);
-        // if nearby_cell_count > 3 {
-        //     println!("neighbors: {}", nearby_cell_count);
-        // }
 
         let calculated_cell = apply_rules_conway(nearby_cell_count, cell);
         
@@ -85,8 +74,6 @@ fn get_nearby_cell_count(pos: &UVec2, cur_gen: &[Pixel]) -> u8 {
             x: pos.x as i32 + dir.x,
             y: pos.y as i32 + dir.y,
         };
-
-        //println!("{} + {} = {}", &pos, &dir, &check_pos);
 
         nearby_cell_count += get_cell_value_conway(check_pos, &cur_gen);
     }
@@ -131,17 +118,10 @@ fn ensure_inbounds(pos: IVec2) -> UVec2 {
 }
 
 fn apply_rules_conway(nearby_cell_count: u8, cur_cell: Pixel) -> Pixel {
-    // let state = if cur_cell == Pixel::WHITE {
-    //     String::from("live")
-    // } else {
-    //     String::from("dead")
-    // };
 
     if nearby_cell_count == 3 || (cur_cell == Pixel::WHITE && nearby_cell_count == 2) {
-        //println!("{} cell near {} -> alive", state, nearby_cell_count);
         Pixel::WHITE
     } else {
-        //println!("{} cell near {} -> dead", state, nearby_cell_count);
         Pixel::BLACK
     }
 }
