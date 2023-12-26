@@ -1,5 +1,3 @@
-mod layer;
-
 // this is how to do imports *the cool, brogrammer way*
 use bevy::{
     prelude::*,           // for example, this actually means bevy::prelude::*
@@ -9,7 +7,8 @@ use bevy::{
 use bevy_pixel_buffer::prelude::*;
 use std::time::SystemTime;
 
-// How often the screen is updated and calculations are run
+mod layer;
+
 const UPDATE_RATE: f64 = 1.0; // IMPORTANT!!!!!!!!! use space to progress time for now
 
 // Map dimensions
@@ -18,8 +17,7 @@ const MAP_DIMS: PixelBufferSize = PixelBufferSize {
     pixel_size: UVec2::new(36, 36), // size of each pixel onscreen      9, 9
 };
 
-// How large flattened arrays storing the map data should be
-const ARRAY_LENGTH: usize = (MAP_DIMS.size.x * MAP_DIMS.size.y) as usize;
+const ARRAY_LENGTH: usize = (MAP_DIMS.size.x * MAP_DIMS.size.y) as usize; // How large flattened arrays storing the map data should be
 
 fn main() {
     println!("i like cats");

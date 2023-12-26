@@ -1,23 +1,21 @@
-use crate::{ARRAY_LENGTH, MAP_DIMS};
+use crate::{ARRAY_LENGTH, MAP_DIMS, layer::Neighbor};
 use array_init::array_init;
 use bevy::math::*;
 use bevy_pixel_buffer::pixel::Pixel;
 
-use super::Weight;
-
-const PATTERN: [Weight; 8] = [
-    Weight { position: IVec2 { x: -1, y:  1 }, multiplier: 1. },
-    Weight { position: IVec2 { x:  0, y:  1 }, multiplier: 1. },
-    Weight { position: IVec2 { x:  1, y:  1 }, multiplier: 1. },
-    Weight { position: IVec2 { x: -1, y:  0 }, multiplier: 1. },
-    Weight { position: IVec2 { x:  1, y:  0 }, multiplier: 1. },
-    Weight { position: IVec2 { x: -1, y: -1 }, multiplier: 1. },
-    Weight { position: IVec2 { x:  0, y: -1 }, multiplier: 1. },
-    Weight { position: IVec2 { x:  1, y: -1 }, multiplier: 1. }
+const PATTERN: [Neighbor; 8] = [
+    Neighbor { position: IVec2 { x: -1, y:  1 }, weight: 1. },
+    Neighbor { position: IVec2 { x:  0, y:  1 }, weight: 1. },
+    Neighbor { position: IVec2 { x:  1, y:  1 }, weight: 1. },
+    Neighbor { position: IVec2 { x: -1, y:  0 }, weight: 1. },
+    Neighbor { position: IVec2 { x:  1, y:  0 }, weight: 1. },
+    Neighbor { position: IVec2 { x: -1, y: -1 }, weight: 1. },
+    Neighbor { position: IVec2 { x:  0, y: -1 }, weight: 1. },
+    Neighbor { position: IVec2 { x:  1, y: -1 }, weight: 1. }
 ];
 
 pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
-    let mut calculated_gen: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::WHITE);
+    let mut calculated_gen: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::BLACK);
 
     for cell_index in 0..cur_gen.len() {
 
