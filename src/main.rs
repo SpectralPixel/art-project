@@ -9,12 +9,12 @@ use std::time::SystemTime;
 
 mod layer;
 
-const UPDATE_RATE: f64 = 1.0; // IMPORTANT!!!!!!!!! use space to progress time for now
+const UPDATE_RATE: f64 = 0.07; // IMPORTANT!!!!!!!!! use space to progress time for now
 
 // Map dimensions
 const MAP_DIMS: PixelBufferSize = PixelBufferSize {
-    size: UVec2::new(40, 22),       // amount of pixels               160, 90
-    pixel_size: UVec2::new(36, 36), // size of each pixel onscreen      9, 9
+    size: UVec2::new(80, 45),       // amount of pixels               160, 90
+    pixel_size: UVec2::new(18, 18), // size of each pixel onscreen      9, 9
 };
 
 const ARRAY_LENGTH: usize = (MAP_DIMS.size.x * MAP_DIMS.size.y) as usize; // How large flattened arrays storing the map data should be
@@ -42,7 +42,7 @@ fn main() {
         )
         .add_systems(
             Update, // (chenge this line to fixedupdate instead of update in final product) FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
-            check_for_keys,
+            check_for_keys, // FOR MANUAL: Update - check_for_keys | FOR AUTOMATIC: FixedUpdate - update_simulation
         )
         .add_systems(
             Update,
@@ -61,7 +61,7 @@ fn setup_simulation(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
         // initialize map with random pixel data
         .edit_frame(|frame| {
             frame.per_pixel(|_, _| {
-                if rand::random::<f32>() > 0.9 {
+                if rand::random::<f32>() > 0.8 {
                     Pixel::WHITE
                 } else {
                     Pixel::TRANSPARENT
@@ -86,21 +86,21 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
 
     // SET THE SCREEN TO THE NEXT GENERATION
     frame.per_pixel_par(|pos, _| {
-        let index = (pos.x + pos.y * MAP_DIMS.size.x) as usize;
+        let index = layer::flatten_pos(pos);
 
-        // if the pixel is white, add a checkerboard pattern
-        if next_gen[index] != Pixel::WHITE {
-            let mut tile_color = next_gen[index].as_color();
-            let manhattan_pos = pos.x + pos.y;
-            let effect_strength: f32 = 0.1;
-            let checkerboard_subtraction: f32 = (manhattan_pos % 2) as f32 * effect_strength;
+        // // if the pixel is white, add a checkerboard pattern
+        // if next_gen[index] != Pixel::WHITE {
+        //     let mut tile_color = next_gen[index].as_color();
+        //     let manhattan_pos = pos.x + pos.y;
+        //     let effect_strength: f32 = 0.1;
+        //     let checkerboard_subtraction: f32 = (manhattan_pos % 2) as f32 * effect_strength;
             
-            tile_color.set_l((tile_color.l() - checkerboard_subtraction).abs());
+        //     tile_color.set_l((tile_color.l() - checkerboard_subtraction).abs());
 
-            Pixel::from(tile_color)
-        } else {
+        //     Pixel::from(tile_color)
+        // } else {
             next_gen[index]
-        }
+        // }
     });
 
     println!(

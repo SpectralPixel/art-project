@@ -1,32 +1,17 @@
 // the functions in layer.rs are meant to be kinda ambigous so that they support many different cellular automata.
 // it makes testing of varous different automata a lot less messy and streamlined.
 
-use crate::{ARRAY_LENGTH, MAP_DIMS};
+use crate::{
+    ARRAY_LENGTH,
+    MAP_DIMS,
+    layer::utils::*
+};
 use array_init::array_init;
 use bevy::math::*;
 use bevy_pixel_buffer::pixel::Pixel;
 
+pub mod utils;
 pub mod conway;
-
-// when you are getting the sum of nearby values that will be used to determine the cell's next state,
-// it is unclear whether is should be getting the values in the GoL way or the Lenia way, and if in the lenia way then what color channel???
-pub enum SumFilter {
-    White,          // if the pixel is perfectly white, return 1. else return 0
-    NotBlack,       // if the pixel is not black, return 1. else return 0
-    Color(Channel), // get only the value of a single color channel
-    TotalValue,     // red, green and blue all added together to create a "total value" (a buzzword i just made up)
-}
-
-pub enum Channel {
-    Red,
-    Green,
-    Blue
-}
-
-pub struct Neighbor {
-    pub position: IVec2,
-    pub weight: f32
-}
 
 pub fn _calculate_next_gen(_cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 
@@ -38,11 +23,11 @@ pub fn _calculate_next_gen(_cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
     placeholder
 }
 
-pub fn calc_cell_sum(pos: &UVec2, pattern: &[Neighbor], cur_gen: &[Pixel]) -> f32 {
+pub fn calc_cell_sum(pos: &UVec2, pattern: &[Neighbor], cur_gen: &[Pixel], filter: CellMode) -> f32 {
     let mut cell_sum = 0.; 
 
     for neighbor in pattern {
-        let rel_pos = neighbor.position;
+        let rel_pos = neighbor.position();
         let check_pos = IVec2 {
             x: pos.x as i32 + rel_pos.x,
             y: pos.y as i32 + rel_pos.y,
@@ -50,38 +35,39 @@ pub fn calc_cell_sum(pos: &UVec2, pattern: &[Neighbor], cur_gen: &[Pixel]) -> f3
 
         let cell_index = get_cell_index(check_pos);
         let cell_pixel = cur_gen[cell_index];
-        let cell_value = get_cell_value(cell_pixel, SumFilter::White);
-        cell_sum += cell_value * neighbor.weight;
+        let cell_value = get_cell_value(cell_pixel, &filter);
+        cell_sum += cell_value * neighbor.weight();
     }
 
     cell_sum
 }
 
-pub fn get_cell_value(pixel: Pixel, filter: SumFilter) -> f32 {
-    let cell_color = pixel.as_color();
+pub fn get_cell_value(cell_pixel: Pixel, filter: &CellMode) -> f32 {
     match filter {
-        SumFilter::White => {
-            if pixel == Pixel::WHITE {
+        CellMode::Color(pixel) => {
+            if cell_pixel == *pixel {
                 1.
             } else {
                 0.
             }
         },
-        SumFilter::NotBlack => {
-            if pixel != Pixel::BLACK {
+        CellMode::NotColor(pixel) => {
+            if cell_pixel != *pixel {
                 1.
             } else {
                 0.
             }
         },
-        SumFilter::Color(channel) => {
+        CellMode::Channel(channel) => {
+            let cell_color = cell_pixel.as_color();
             match channel {
-                Channel::Red => cell_color.r(),
-                Channel::Green => cell_color.g(),
-                Channel::Blue => cell_color.b(),
+                ColorChannel::Red => cell_color.r(),
+                ColorChannel::Green => cell_color.g(),
+                ColorChannel::Blue => cell_color.b(),
             }
         },
-        SumFilter::TotalValue => {
+        CellMode::TotalValue => {
+            let cell_color = cell_pixel.as_color();
             let total_value = cell_color.r() + cell_color.g() + cell_color.b();
             total_value
         },
