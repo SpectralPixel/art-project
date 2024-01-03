@@ -12,6 +12,7 @@ use bevy_pixel_buffer::pixel::Pixel;
 
 pub mod utils;
 pub mod conway;
+pub mod boscos;
 
 pub fn _calculate_next_gen(_cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 

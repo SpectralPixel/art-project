@@ -9,12 +9,12 @@ use std::time::SystemTime;
 
 mod layer;
 
-const UPDATE_RATE: f64 = 0.07; // IMPORTANT!!!!!!!!! use space to progress time for now
+const UPDATE_RATE: f64 = 0.1; // IMPORTANT!!!!!!!!! use space to progress time for now
 
 // Map dimensions
 const MAP_DIMS: PixelBufferSize = PixelBufferSize {
-    size: UVec2::new(80, 45),       // amount of pixels               160, 90
-    pixel_size: UVec2::new(18, 18), // size of each pixel onscreen      9, 9
+    size: UVec2::new(160, 90),       // amount of pixels               160, 90
+    pixel_size: UVec2::new(9, 9), // size of each pixel onscreen      9, 9
 };
 
 const ARRAY_LENGTH: usize = (MAP_DIMS.size.x * MAP_DIMS.size.y) as usize; // How large flattened arrays storing the map data should be
@@ -41,8 +41,8 @@ fn main() {
             update_simulation,
         )
         .add_systems(
-            Update, // (chenge this line to fixedupdate instead of update in final product) FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
-            check_for_keys, // FOR MANUAL: Update - check_for_keys | FOR AUTOMATIC: FixedUpdate - update_simulation
+            FixedUpdate, // (chenge this line to fixedupdate instead of update in final product) FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
+            update_simulation, // FOR MANUAL: Update - check_for_keys | FOR AUTOMATIC: FixedUpdate - update_simulation
         )
         .add_systems(
             Update,
@@ -61,7 +61,7 @@ fn setup_simulation(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
         // initialize map with random pixel data
         .edit_frame(|frame| {
             frame.per_pixel(|_, _| {
-                if rand::random::<f32>() > 0.8 {
+                if rand::random::<f32>() > 0.5 {
                     Pixel::WHITE
                 } else {
                     Pixel::TRANSPARENT
@@ -82,25 +82,12 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
     let mut frame = pb.frame();
     let cur_gen: &[Pixel] = &frame.raw();
 
-    let next_gen = layer::conway::calculate_next_gen(cur_gen);
+    let next_gen = layer::boscos::calculate_next_gen(cur_gen);
 
     // SET THE SCREEN TO THE NEXT GENERATION
     frame.per_pixel_par(|pos, _| {
         let index = layer::flatten_pos(pos);
-
-        // // if the pixel is white, add a checkerboard pattern
-        // if next_gen[index] != Pixel::WHITE {
-        //     let mut tile_color = next_gen[index].as_color();
-        //     let manhattan_pos = pos.x + pos.y;
-        //     let effect_strength: f32 = 0.1;
-        //     let checkerboard_subtraction: f32 = (manhattan_pos % 2) as f32 * effect_strength;
-            
-        //     tile_color.set_l((tile_color.l() - checkerboard_subtraction).abs());
-
-        //     Pixel::from(tile_color)
-        // } else {
-            next_gen[index]
-        // }
+        next_gen[index]
     });
 
     println!(
