@@ -23,14 +23,16 @@ pub struct Neighbor {
 }
 
 impl Neighbor {
-    pub fn new(pos: (i32, i32), weight: f32) -> Self {
+    pub const DUMMY: Self = Self::new_full((0, 0));
+
+    pub const fn new(pos: (i32, i32), weight: f32) -> Self {
         Neighbor {
             position: IVec2 { x: pos.0, y: pos.1 }, 
             weight: weight
         }
     }
 
-    pub fn new_full(pos: (i32, i32)) -> Self {
+    pub const fn new_full(pos: (i32, i32)) -> Self {
         Neighbor {
             position: IVec2 { x: pos.0, y: pos.1 },
             weight: 1.

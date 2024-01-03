@@ -1,26 +1,34 @@
 use crate::{
     ARRAY_LENGTH,
     MAP_DIMS,
-    layer::utils::*
+    layer::{utils::*, flatten_pos}
 };
 use array_init::array_init;
 use bevy::math::*;
 use bevy_pixel_buffer::pixel::Pixel;
 use std::sync::OnceLock;
 
-fn pattern() -> &'static [Neighbor; 8] {
-    static PATTERN: OnceLock<[Neighbor; 8]> = OnceLock::new();
+// diameter = radius * 2 + 1
+// area of square = diameter ^ 2
+// remove center cell = area - 1
+const KERNEL_RADIUS: i32 = 1;
+const KERNEL_CELL_COUNT: usize = ((KERNEL_RADIUS * 2 + 1 as i32).pow(2) - 1) as usize;
+
+fn pattern() -> &'static [Neighbor; KERNEL_CELL_COUNT] {
+    static PATTERN: OnceLock<[Neighbor; KERNEL_CELL_COUNT]> = OnceLock::new();
     PATTERN.get_or_init(|| {
-        let pattern: [Neighbor; 8] = [
-            Neighbor::new_full((-1, 1)),
-            Neighbor::new_full(( 0, 1)),
-            Neighbor::new_full(( 1, 1)),
-            Neighbor::new_full((-1, 0)),
-            Neighbor::new_full(( 1, 0)),
-            Neighbor::new_full((-1,-1)),
-            Neighbor::new_full(( 0,-1)),
-            Neighbor::new_full(( 1,-1))
-        ];
+        let mut pattern: [Neighbor; KERNEL_CELL_COUNT] = array_init(|_| Neighbor::DUMMY);
+
+        let mut i = 0;
+        for x in -KERNEL_RADIUS..KERNEL_RADIUS + 1 {
+        for y in -KERNEL_RADIUS..KERNEL_RADIUS + 1 {
+            if x == 0 && y == 0 {
+                continue;
+            }
+            pattern[i] = Neighbor::new_full((x, y));
+            i += 1;
+        }}
+        
         pattern
     })
 }
