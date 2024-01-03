@@ -47,7 +47,7 @@ pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 
         let cell_sum = super::calc_cell_sum(&cell_pos, pattern(), &cur_gen, CellMode::Color(Pixel::WHITE));
 
-        let calculated_cell = apply_rules(cell_sum as u8, cur_cell_value);
+        let calculated_cell = apply_rules(cell_sum as u32, cur_cell_value);
 
         calculated_gen[cell_index] = calculated_cell;
     }
@@ -55,8 +55,8 @@ pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
     calculated_gen
 }
 
-fn apply_rules(nearby_cell_count: u8, cur_cell: Pixel) -> Pixel {
-    if nearby_cell_count == 3 || (cur_cell == Pixel::WHITE && nearby_cell_count == 2) {
+fn apply_rules(value: u32, cur_cell: Pixel) -> Pixel {
+    if value == 3 || (cur_cell == Pixel::WHITE && value == 2) {
         Pixel::WHITE
     } else {
         Pixel::BLACK

@@ -11,7 +11,7 @@ use std::sync::OnceLock;
 // diameter = radius * 2 + 1
 // area of square = diameter ^ 2
 // remove center cell = area - 1
-const KERNEL_RADIUS: i32 = 5;
+const KERNEL_RADIUS: i32 = 4;
 const KERNEL_CELL_COUNT: usize = ((KERNEL_RADIUS * 2 + 1 as i32).pow(2) - 1) as usize;
 
 fn pattern() -> &'static [Neighbor; KERNEL_CELL_COUNT] {
@@ -56,7 +56,7 @@ pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 }
 
 fn apply_rules(value: u32, cur_cell: Pixel) -> Pixel {
-    if (cur_cell == Pixel::WHITE && (value >= 33 && value <= 57)) || (cur_cell != Pixel::WHITE && (value >= 34 && value <= 45)) {
+    if (cur_cell == Pixel::WHITE && (value >= 40 && value <= 80)) || (cur_cell != Pixel::WHITE && (value >= 41 && value <= 81)) {
         Pixel::WHITE
     } else {
         Pixel::BLACK

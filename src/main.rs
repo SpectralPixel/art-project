@@ -13,8 +13,8 @@ const UPDATE_RATE: f64 = 0.1; // IMPORTANT!!!!!!!!! use space to progress time f
 
 // Map dimensions
 const MAP_DIMS: PixelBufferSize = PixelBufferSize {
-    size: UVec2::new(160, 90),       // amount of pixels               160, 90
-    pixel_size: UVec2::new(9, 9), // size of each pixel onscreen      9, 9
+    size: UVec2::new(240, 135),       // amount of pixels               160, 90
+    pixel_size: UVec2::new(6, 6), // size of each pixel onscreen      9, 9
 };
 
 const ARRAY_LENGTH: usize = (MAP_DIMS.size.x * MAP_DIMS.size.y) as usize; // How large flattened arrays storing the map data should be
