@@ -15,14 +15,21 @@ pub mod conway;
 pub mod boscos;
 pub mod majority;
 
-pub fn _calculate_next_gen(_cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
+pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 
-    // let calculated_red: [f64; ARRAY_LENGTH] = array_init(|_| 0.);
-    // let calculated_green: [f64; ARRAY_LENGTH] = array_init(|_| 0.);
-    // let calculated_blue: [f64; ARRAY_LENGTH] = array_init(|_| 0.);
+    let calculated_red: [f32; ARRAY_LENGTH] = boscos::calculate_next_gen(cur_gen);
+    let calculated_green: [f32; ARRAY_LENGTH] = conway::calculate_next_gen(cur_gen);
+    let calculated_blue: [f32; ARRAY_LENGTH] = majority::calculate_next_gen(cur_gen);
 
-    let placeholder: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::WHITE);
-    placeholder
+    let mut calculated_gen: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::WHITE);
+    for i in 0..calculated_gen.len() {
+        calculated_gen[i] = Pixel::from([
+            calculated_red[i],
+            calculated_green[i],
+            calculated_blue[i]
+        ]);
+    }
+    calculated_gen
 }
 
 pub fn calc_cell_sum(pos: &UVec2, pattern: &[Neighbor], cur_gen: &[Pixel], filter: CellMode) -> f32 {

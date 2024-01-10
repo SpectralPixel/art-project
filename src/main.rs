@@ -41,8 +41,8 @@ fn main() {
             update_simulation,
         )
         .add_systems(
-            FixedUpdate, // (chenge this line to fixedupdate instead of update in final product) FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
-            update_simulation, // FOR MANUAL: Update - check_for_keys | FOR AUTOMATIC: FixedUpdate - update_simulation
+            Update, // (chenge this line to fixedupdate instead of update in final product) FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
+            check_for_keys, // FOR MANUAL: Update - check_for_keys | FOR AUTOMATIC: FixedUpdate - update_simulation
         )
         .add_systems(
             Update,
@@ -61,11 +61,17 @@ fn setup_simulation(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
         // initialize map with random pixel data
         .edit_frame(|frame| {
             frame.per_pixel(|_, _| {
+                let mut new_color = Color::BLACK;
                 if rand::random::<f32>() > 0.5 {
-                    Pixel::WHITE
-                } else {
-                    Pixel::TRANSPARENT
+                    new_color = *new_color.set_r(1.);
+                } 
+                if rand::random::<f32>() > 0.35 {
+                    new_color = *new_color.set_g(1.);
                 }
+                if rand::random::<f32>() > 0.5 {
+                    new_color = *new_color.set_b(1.);
+                }
+                Pixel::from(new_color)
             })
         });
 }
@@ -82,7 +88,7 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
     let mut frame = pb.frame();
     let cur_gen: &[Pixel] = &frame.raw();
 
-    let next_gen = layer::boscos::calculate_next_gen(cur_gen);
+    let next_gen = layer::calculate_next_gen(cur_gen);
 
     // SET THE SCREEN TO THE NEXT GENERATION
     frame.per_pixel_par(|pos, _| {

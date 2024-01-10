@@ -33,8 +33,8 @@ fn pattern() -> &'static [Neighbor; KERNEL_CELL_COUNT] {
     })
 }
 
-pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
-    let mut calculated_gen: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::BLACK);
+pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [f32; ARRAY_LENGTH] {
+    let mut calculated_gen: [f32; ARRAY_LENGTH] = array_init(|_| 0.);
 
     for cell_index in 0..cur_gen.len() {
 
@@ -45,9 +45,9 @@ pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
             y: (cell_index as f64 / MAP_DIMS.size.x as f64).floor() as u32,
         };
 
-        let cell_sum = super::calc_cell_sum(&cell_pos, pattern(), &cur_gen, CellMode::Color(Pixel::WHITE));
+        let cell_sum = super::calc_cell_sum(&cell_pos, pattern(), &cur_gen, CellMode::Channel(ColorChannel::Red));
 
-        let calculated_cell = apply_rules(cell_sum as u32, cur_cell_value);
+        let calculated_cell = apply_rules(cell_sum as u32, cur_cell_value.as_color().r());
 
         calculated_gen[cell_index] = calculated_cell;
     }
@@ -55,10 +55,10 @@ pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
     calculated_gen
 }
 
-fn apply_rules(value: u32, cur_cell: Pixel) -> Pixel {
-    if (cur_cell == Pixel::WHITE && (value >= 33 && value <= 57)) || (cur_cell != Pixel::WHITE && (value >= 34 && value <= 45)) {
-        Pixel::WHITE
+fn apply_rules(value: u32, cur_cell: f32) -> f32 {
+    if (cur_cell >= 0.95 && (value >= 33 && value <= 57)) || (cur_cell < 0.95 && (value >= 34 && value <= 45)) {
+        1.
     } else {
-        Pixel::BLACK
+        0.
     }
 }

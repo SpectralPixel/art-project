@@ -17,6 +17,7 @@ pub enum ColorChannel {
     Blue,
 }
 
+#[derive(Debug)]
 pub struct Neighbor {
     position: IVec2,
     weight: f32,
