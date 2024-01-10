@@ -26,7 +26,7 @@ fn main() {
     // docs for "Window": https://docs.rs/bevy/latest/bevy/window/struct.Window.html
     let window_plugin = WindowPlugin {
         primary_window: Some(Window {
-            title: String::from("Cellular Automata by Makki & Emil"),
+            title: String::from("TERRIBLE Cellular Automata by Makki & Emil"),
             mode: WindowMode::Fullscreen,
             ..default()
         }),
