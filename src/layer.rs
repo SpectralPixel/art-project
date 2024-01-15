@@ -12,11 +12,16 @@ use bevy::{
 };
 use array_init::array_init;
 use bevy_pixel_buffer::pixel::Pixel;
+use rand::{thread_rng, Rng};
 
 pub mod utils;
 pub mod conway;
 pub mod boscos;
 pub mod majority;
+
+pub const SURVIVAL_VALUE: f32 = 0.95;
+pub const FADE_FACTOR: f32 = 2.1;
+const LEAKAGE: i32 = 20; // lower value = higher chance of leak
 
 pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 
@@ -26,10 +31,45 @@ pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 
     let mut calculated_gen: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::WHITE);
     for i in 0..calculated_gen.len() {
+        let rand_r = thread_rng().gen_range(0..LEAKAGE);
+        let rand_g = thread_rng().gen_range(0..LEAKAGE);
+        let rand_b = thread_rng().gen_range(0..LEAKAGE);
         calculated_gen[i] = Pixel::from([
-            calculated_red[i],
-            calculated_green[i],
-            calculated_blue[i]
+            if rand_r != 0 { calculated_red[i] }
+            else {
+                if rand_r % 2 == 0 {
+                    if calculated_green[i] >= SURVIVAL_VALUE { calculated_green[i] }
+                    else { calculated_red[i] }
+                }
+                else {
+                    if calculated_blue[i] >= SURVIVAL_VALUE { calculated_blue[i] }
+                    else { calculated_red[i] }
+                }   
+            },
+
+            if rand_g != 0 { calculated_green[i] }
+            else {
+                if rand_g % 2 == 0 {
+                    if calculated_red[i] >= SURVIVAL_VALUE { calculated_red[i] }
+                    else { calculated_green[i] }
+                }
+                else {
+                    if calculated_blue[i] >= SURVIVAL_VALUE { calculated_blue[i] }
+                    else { calculated_green[i] }
+                }    
+            },
+
+            if rand_b != 0 { calculated_blue[i] }
+            else {
+                if rand_b % 2 == 0 {
+                    if calculated_red[i] >= SURVIVAL_VALUE { calculated_red[i] }
+                    else { calculated_blue[i] }
+                }
+                else {
+                    if calculated_green[i] >= SURVIVAL_VALUE { calculated_green[i] }
+                    else { calculated_blue[i] }
+                }    
+            },
         ]);
     }
     calculated_gen
@@ -70,7 +110,36 @@ pub fn get_cell_value(cell_pixel: Pixel, filter: &CellMode) -> f32 {
                 0.
             }
         },
-        CellMode::Channel(channel) => {
+        CellMode::Channel(channel, threshold) => {
+            let cell_color = round_color_fix(cell_pixel.as_color());
+            match channel {
+                ColorChannel::Red => {
+                    let r = cell_color.r();
+                    if r >= *threshold {
+                        1.
+                    } else {
+                        0.
+                    }
+                },
+                ColorChannel::Green => {
+                    let g = cell_color.g();
+                    if g >= *threshold {
+                        1.
+                    } else {
+                        0.
+                    }
+                },
+                ColorChannel::Blue => {
+                    let b = cell_color.b();
+                    if b >= *threshold {
+                        1.
+                    } else {
+                        0.
+                    }
+                },
+            }
+        },
+        CellMode::ChannelValue(channel) => {
             let cell_color = round_color_fix(cell_pixel.as_color());
             match channel {
                 ColorChannel::Red => cell_color.r(),
@@ -134,4 +203,12 @@ pub fn ensure_inbounds(pos: IVec2) -> UVec2 {
         x: pos.x as u32,
         y: pos.y as u32,
     }
+}
+
+pub fn fade_cell(mut cell: f32) -> f32 {
+    if cell < SURVIVAL_VALUE {
+        cell /= FADE_FACTOR;
+        cell -= 0.03;
+    }
+    cell
 }

@@ -7,6 +7,7 @@ use array_init::array_init;
 use bevy::math::*;
 use bevy_pixel_buffer::pixel::Pixel;
 use std::sync::OnceLock;
+use super::{SURVIVAL_VALUE, FADE_FACTOR};
 
 // diameter = radius * 2 + 1
 // area of square = diameter ^ 2
@@ -46,20 +47,24 @@ pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [f32; ARRAY_LENGTH] {
             y: (cell_index as f64 / MAP_DIMS.size.x as f64).floor() as u32,
         };
 
-        let cell_sum = super::calc_cell_sum(&cell_pos, pattern(), &cur_gen, CellMode::Channel(ColorChannel::Green));
+        let cell_sum = super::calc_cell_sum(&cell_pos, pattern(), &cur_gen, CellMode::Channel(ColorChannel::Green, SURVIVAL_VALUE));
 
-        let calculated_cell = apply_rules(cell_sum as u32, cur_cell_value.as_color().g());
+        let calculated_cell = apply_rules(cell_sum, cur_cell_value.as_color().g());
 
-        calculated_gen[cell_index] = calculated_cell;
+        let faded_cell = super::fade_cell(calculated_cell);
+
+        calculated_gen[cell_index] = faded_cell;
     }
 
     calculated_gen
 }
 
-fn apply_rules(value: u32, cur_cell: f32) -> f32 {
-    if (cur_cell >= 0.95 && (value == 2 || value == 3)) || (cur_cell < 0.95 && value == 3) {
+fn apply_rules(value: f32, cur_cell: f32) -> f32 {
+    if (cur_cell >= SURVIVAL_VALUE && (value == 2. || value == 3.)) || (cur_cell < SURVIVAL_VALUE && value == 3.) {
         1.
     } else {
-        0.
+        // thread_rng().gen_range(0..10) as f32 / 100.
+        cur_cell / FADE_FACTOR
+        // 0.
     }
 }

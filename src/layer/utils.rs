@@ -6,7 +6,8 @@ use bevy_pixel_buffer::pixel::Pixel;
 pub enum CellMode {
     Color(Pixel),          // if the pixel is perfectly white, return 1. else return 0
     NotColor(Pixel),       // if the pixel is not black, return 1. else return 0
-    Channel(ColorChannel),     // get only the value of a single color channel
+    Channel(ColorChannel, f32),     // same as Color, but for channels. if the value is above the threshold, return one. else return 0
+    ChannelValue(ColorChannel),     // get only the value of a single color channel
     TotalValue,                // red, green and blue all added together to create a "total value" (a buzzword i just made up)
 }
 
