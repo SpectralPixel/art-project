@@ -6,8 +6,11 @@ use crate::{
     MAP_DIMS,
     layer::utils::*
 };
+use bevy::{
+    math::*,
+    render::color::Color
+};
 use array_init::array_init;
-use bevy::math::*;
 use bevy_pixel_buffer::pixel::Pixel;
 
 pub mod utils;
@@ -68,7 +71,7 @@ pub fn get_cell_value(cell_pixel: Pixel, filter: &CellMode) -> f32 {
             }
         },
         CellMode::Channel(channel) => {
-            let cell_color = cell_pixel.as_color();
+            let cell_color = round_color_fix(cell_pixel.as_color());
             match channel {
                 ColorChannel::Red => cell_color.r(),
                 ColorChannel::Green => cell_color.g(),
@@ -76,11 +79,29 @@ pub fn get_cell_value(cell_pixel: Pixel, filter: &CellMode) -> f32 {
             }
         },
         CellMode::TotalValue => {
-            let cell_color = cell_pixel.as_color();
+            let cell_color = round_color_fix(cell_pixel.as_color());
             let total_value = cell_color.r() + cell_color.g() + cell_color.b();
             total_value
         },
     }
+}
+
+// when converting from a pixel to a color, the color ends up with a slight precision error.
+// this aims to fix that by rounding all channels during a conversion.
+fn round_color_fix(mut color: Color) -> Color {
+    let r = color.r();
+    let g = color.g();
+    let b = color.b();
+    if r > 0.99 || r < 0.01 {
+        color.set_r(r.round());
+    }
+    if g > 0.99 || g < 0.01 {
+        color.set_g(g.round());
+    }
+    if b > 0.99 || b < 0.01 {
+        color.set_b(b.round());
+    }
+    color
 }
 
 pub fn get_cell_index(pos: IVec2) -> usize {
