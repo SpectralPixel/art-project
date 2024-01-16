@@ -2,14 +2,18 @@
 use bevy::{
     prelude::*,           // for example, this actually means bevy::prelude::*
     time::prelude::Fixed, // and this actually means bevy::time::prelude::Fixed
-    window::WindowMode,   // basically it means you have to type in "bevy::" 3 times less, but also makes everything 100% more confusing
+    window::{
+        WindowMode,
+        PrimaryWindow
+    },                    // basically it means you have to type in "bevy::" 3 times less, but also makes everything 100% more confusing
+    render::view::screenshot::ScreenshotManager
 };
 use bevy_pixel_buffer::prelude::*;
 use std::time::SystemTime;
 
 mod layer;
 
-const UPDATE_RATE: f64 = 0.1; // IMPORTANT!!!!!!!!! use space to progress time for now
+const UPDATE_RATE: f64 = 2.; // IMPORTANT!!!!!!!!! use space to progress time for now
 
 // Map dimensions
 const MAP_DIMS: PixelBufferSize = PixelBufferSize {
@@ -41,8 +45,12 @@ fn main() {
             update_simulation,
         )
         .add_systems(
-            Update, // (chenge this line to fixedupdate instead of update in final product) FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
-            check_for_keys, // FOR MANUAL: Update - check_for_keys | FOR AUTOMATIC: FixedUpdate - update_simulation
+            FixedUpdate, // (chenge this line to fixedupdate instead of update in final product) FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
+            update_simulation, // FOR MANUAL: Update - check_for_keys | FOR AUTOMATIC: FixedUpdate - update_simulation
+        )
+        .add_systems(
+            FixedUpdate,    // (change this line to fixedupdate instead of update in final product) FixedUpdate runs a set amount of times every seconds, and is independent from screen updates
+            take_screenshot, // FOR MANUAL: Update - check_for_keys | FOR AUTOMATIC: FixedUpdate - update_simulation
         )
         .add_systems(
             Update,
@@ -103,4 +111,16 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
             .unwrap_or_default() // gets the Type out of the returned Result<Type, Error>, and if there is an error it just turns it into the default (which in this case is 0)
             .as_secs_f32() // cast from Duration into f32
     )
+}
+
+fn take_screenshot(
+    main_window: Query<Entity, With<PrimaryWindow>>,
+    mut screenshot_manager: ResMut<ScreenshotManager>,
+    mut counter: Local<u32>,
+) {
+    let path = format!("./movie/screenshot-{}.png", *counter);
+    *counter += 1;
+    screenshot_manager
+        .save_screenshot_to_disk(main_window.single(), path)
+        .unwrap();
 }
