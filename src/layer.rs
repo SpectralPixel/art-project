@@ -22,7 +22,7 @@ pub mod marine;
 
 pub const SURVIVAL_VALUE: f32 = 0.95;
 pub const FADE_FACTOR: f32 = 2.1;
-const LEAKAGE: i32 = 20; // lower value = higher chance of leak
+const LEAKAGE: i32 = 50; // lower value = higher chance of leak
 
 pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 

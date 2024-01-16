@@ -123,13 +123,13 @@ fn take_screenshot(
     startup_time: Res<Time<Real>>
 ) {
     let id = &format!("{:?}", startup_time.startup())[13..=17];
-    let path = format!("./movie/screenshot-{}-{}.png", id, *counter);
+    let path = format!("C:/Users/coolk/Desktop/movie/screenshot-{}-{}.png", id, *counter);
     *counter += 1;
     screenshot_manager
         .save_screenshot_to_disk(main_window.single(), path)
         .unwrap();
 
-    if *counter > 100 {
-        exit.send(AppExit);
-    }
+    // if *counter > 1000 {
+    //     exit.send(AppExit);
+    // }
 }

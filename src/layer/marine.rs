@@ -64,7 +64,7 @@ fn apply_rules(value: f32, cur_cell: f32) -> f32 {
         //println!("Neighbors: {}. Current cell value {}. Next: ALIVE", value, cur_cell);
         1.
     } else {
-        //cur_cell / FADE_FACTOR
-        0.
+        cur_cell / FADE_FACTOR
+        //0.
     }
 }
