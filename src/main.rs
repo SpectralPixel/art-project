@@ -6,14 +6,14 @@ use bevy::{
         WindowMode,
         PrimaryWindow
     },                    // basically it means you have to type in "bevy::" 3 times less, but also makes everything 100% more confusing
-    render::view::screenshot::ScreenshotManager
+    render::view::screenshot::ScreenshotManager, app::AppExit
 };
 use bevy_pixel_buffer::prelude::*;
 use std::time::SystemTime;
 
 mod layer;
 
-const UPDATE_RATE: f64 = 2.; // IMPORTANT!!!!!!!!! use space to progress time for now
+const UPDATE_RATE: f64 = 1.; // IMPORTANT!!!!!!!!! use space to progress time for now
 
 // Map dimensions
 const MAP_DIMS: PixelBufferSize = PixelBufferSize {
@@ -84,13 +84,15 @@ fn setup_simulation(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
         });
 }
 
-fn check_for_keys(pb: QueryPixelBuffer, keys: Res<Input<KeyCode>>) {
-    if keys.just_pressed(KeyCode::Space) {
-        update_simulation(pb);
-    }
-}
+// fn check_for_keys(pb: QueryPixelBuffer, keys: Res<Input<KeyCode>>) {
+//     if keys.just_pressed(KeyCode::Space) {
+//         update_simulation(pb);
+//     }
+// }
 
-fn update_simulation(mut pb: QueryPixelBuffer) {
+fn update_simulation(
+    mut pb: QueryPixelBuffer
+) {
     let step_start_timestamp = SystemTime::now();
 
     let mut frame = pb.frame();
@@ -105,7 +107,7 @@ fn update_simulation(mut pb: QueryPixelBuffer) {
     });
 
     println!(
-        "Time to calculate: {}",
+        "Time to calculate: {}", 
         SystemTime::now() // gets the current system time
             .duration_since(step_start_timestamp) // gets the difference between the current time and the time at the start of the calculation, returns Result<Type, Error>
             .unwrap_or_default() // gets the Type out of the returned Result<Type, Error>, and if there is an error it just turns it into the default (which in this case is 0)
@@ -117,10 +119,17 @@ fn take_screenshot(
     main_window: Query<Entity, With<PrimaryWindow>>,
     mut screenshot_manager: ResMut<ScreenshotManager>,
     mut counter: Local<u32>,
+    mut exit: EventWriter<AppExit>,
+    startup_time: Res<Time<Real>>
 ) {
-    let path = format!("./movie/screenshot-{}.png", *counter);
+    let id = &format!("{:?}", startup_time.startup())[13..=17];
+    let path = format!("./movie/screenshot-{}-{}.png", id, *counter);
     *counter += 1;
     screenshot_manager
         .save_screenshot_to_disk(main_window.single(), path)
         .unwrap();
+
+    if *counter > 100 {
+        exit.send(AppExit);
+    }
 }
