@@ -48,7 +48,7 @@ pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [f32; ARRAY_LENGTH] {
 
         let cell_sum = super::calc_cell_sum(&cell_pos, pattern(), &cur_gen, CellMode::Channel(ColorChannel::Blue, SURVIVAL_VALUE));
 
-        let calculated_cell = apply_rules(cell_sum, cur_cell_value.as_color().b());
+        let calculated_cell = apply_rules(cell_sum, super::round_color_fix(cur_cell_value.as_color()).b());
 
         let faded_cell = super::fade_cell(calculated_cell);
 

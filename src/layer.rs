@@ -18,6 +18,7 @@ pub mod utils;
 pub mod conway;
 pub mod boscos;
 pub mod majority;
+pub mod marine;
 
 pub const SURVIVAL_VALUE: f32 = 0.95;
 pub const FADE_FACTOR: f32 = 2.1;
@@ -26,11 +27,17 @@ const LEAKAGE: i32 = 20; // lower value = higher chance of leak
 pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [Pixel; ARRAY_LENGTH] {
 
     let calculated_red: [f32; ARRAY_LENGTH] = boscos::calculate_next_gen(cur_gen);
-    let calculated_green: [f32; ARRAY_LENGTH] = conway::calculate_next_gen(cur_gen);
+    let calculated_green: [f32; ARRAY_LENGTH] = marine::calculate_next_gen(cur_gen);
     let calculated_blue: [f32; ARRAY_LENGTH] = majority::calculate_next_gen(cur_gen);
 
     let mut calculated_gen: [Pixel; ARRAY_LENGTH] = array_init(|_| Pixel::WHITE);
     for i in 0..calculated_gen.len() {
+        // calculated_gen[i] = Pixel::from([
+        //     0.,//calculated_red[i],
+        //     calculated_green[i],
+        //     0.//calculated_blue[i]
+        // ]);
+
         let rand_r = thread_rng().gen_range(0..LEAKAGE);
         let rand_g = thread_rng().gen_range(0..LEAKAGE);
         let rand_b = thread_rng().gen_range(0..LEAKAGE);
@@ -157,7 +164,7 @@ pub fn get_cell_value(cell_pixel: Pixel, filter: &CellMode) -> f32 {
 
 // when converting from a pixel to a color, the color ends up with a slight precision error.
 // this aims to fix that by rounding all channels during a conversion.
-fn round_color_fix(mut color: Color) -> Color {
+pub fn round_color_fix(mut color: Color) -> Color {
     let r = color.r();
     let g = color.g();
     let b = color.b();

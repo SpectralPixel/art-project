@@ -65,7 +65,7 @@ fn setup_simulation(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
                 if rand::random::<f32>() > 0.5 {
                     new_color = *new_color.set_r(1.);
                 } 
-                if rand::random::<f32>() > 0.35 {
+                if rand::random::<f32>() > 0.3 { // (CONWAY - 0.35), (MARINE - 0.7)
                     new_color = *new_color.set_g(1.);
                 }
                 if rand::random::<f32>() > 0.5 {

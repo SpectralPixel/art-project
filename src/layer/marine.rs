@@ -11,9 +11,9 @@ use super::{SURVIVAL_VALUE, FADE_FACTOR};
 
 // diameter = radius * 2 + 1
 // area of square = diameter ^ 2
-// remove center cell = area - 1
-const KERNEL_RADIUS: i32 = 1;
-const KERNEL_CELL_COUNT: usize = ((KERNEL_RADIUS * 2 + 1 as i32).pow(2) - 1) as usize;
+// remove center cell = area - 11
+const KERNEL_RADIUS: i32 = 2;
+const KERNEL_CELL_COUNT: usize = ((KERNEL_RADIUS * 2 as i32).pow(2) - 1) as usize;
 
 fn pattern() -> &'static [Neighbor; KERNEL_CELL_COUNT] {
     static PATTERN: OnceLock<[Neighbor; KERNEL_CELL_COUNT]> = OnceLock::new();
@@ -21,12 +21,13 @@ fn pattern() -> &'static [Neighbor; KERNEL_CELL_COUNT] {
         let mut pattern: [Neighbor; KERNEL_CELL_COUNT] = array_init(|_| Neighbor::DUMMY);
 
         let mut i = 0;
-        for x in -KERNEL_RADIUS..KERNEL_RADIUS + 1 {
-        for y in -KERNEL_RADIUS..KERNEL_RADIUS + 1 {
+        for x in -KERNEL_RADIUS..KERNEL_RADIUS {
+        for y in -KERNEL_RADIUS..KERNEL_RADIUS {
             if x == 0 && y == 0 {
                 continue;
             }
             pattern[i] = Neighbor::new_full((x, y));
+            //println!("{:?}", pattern[i]);
             i += 1;
         }}
         
@@ -59,11 +60,11 @@ pub fn calculate_next_gen(cur_gen: &[Pixel]) -> [f32; ARRAY_LENGTH] {
 }
 
 fn apply_rules(value: f32, cur_cell: f32) -> f32 {
-    if (cur_cell >= SURVIVAL_VALUE && (value >= 2. && value <= 3.)) || (cur_cell < SURVIVAL_VALUE && value == 3.) {
+    if (cur_cell >= SURVIVAL_VALUE && (value == 4. || (value >= 6. && value <= 9.))) || (cur_cell < SURVIVAL_VALUE && (value >= 6. && value <= 8.)) {
+        //println!("Neighbors: {}. Current cell value {}. Next: ALIVE", value, cur_cell);
         1.
     } else {
-        // thread_rng().gen_range(0..10) as f32 / 100.
-        // cur_cell / FADE_FACTOR
+        //cur_cell / FADE_FACTOR
         0.
     }
 }
